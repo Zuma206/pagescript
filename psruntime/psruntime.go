@@ -7,9 +7,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-type PSRuntime struct {
-	passes []NodeHandlers
-}
+type PSRuntime struct{}
 
 func NewPSRuntime() *PSRuntime {
 	return &PSRuntime{}
@@ -21,6 +19,8 @@ type PSContext struct {
 	output    io.Writer
 }
 
+var passes = []NodeHandlers{}
+
 func (psr *PSRuntime) Run(input io.Reader, output io.Writer) error {
 	document, err := html.Parse(input)
 	if err != nil {
@@ -30,7 +30,7 @@ func (psr *PSRuntime) Run(input io.Reader, output io.Writer) error {
 		output:    output,
 		psRuntime: psr,
 	}
-	for _, passHandlers := range psr.passes {
+	for _, passHandlers := range passes {
 		psc.handlers = passHandlers
 		if err := psc.RunNode(document); err != nil {
 			return err

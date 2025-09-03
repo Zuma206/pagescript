@@ -9,6 +9,7 @@ import (
 var evalNodeHandlers = &NodeHandlerRegistry{
 	nodeHandlers: NodeHandlerMap{
 		html.DocumentNode: evalChildren,
+		html.DoctypeNode:  evalDoctype,
 	},
 }
 
@@ -19,4 +20,9 @@ func evalChildren(psc *PSContext, node *html.Node) error {
 		}
 	}
 	return nil
+}
+
+func evalDoctype(psc *PSContext, node *html.Node) error {
+	_, err := fmt.Fprintf(psc.Output(), "<!DOCTYPE %s>", node.Data)
+	return err
 }

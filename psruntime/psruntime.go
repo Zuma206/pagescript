@@ -19,7 +19,13 @@ type PSContext struct {
 	output    io.Writer
 }
 
-var passes = []NodeHandlers{}
+func (psc *PSContext) Output() io.Writer {
+	return psc.output
+}
+
+var passes = []NodeHandlers{
+	evalNodeHandlers,
+}
 
 func (psr *PSRuntime) Run(input io.Reader, output io.Writer) error {
 	document, err := html.Parse(input)

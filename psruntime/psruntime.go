@@ -42,6 +42,9 @@ func (psr *PSRuntime) Run(input io.Reader, output io.Writer) error {
 			return err
 		}
 	}
+	if _, err := fmt.Fprintln(output); err != nil {
+		return err
+	}
 	return nil
 }
 

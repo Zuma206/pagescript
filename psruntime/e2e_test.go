@@ -31,14 +31,14 @@ func testE2E(t *testing.T) error {
 		if entry.IsDir() || !strings.HasSuffix(entry.Name(), testSuffix) {
 			continue
 		}
-		if err := runE2ETest(t, path.Join(dirPath, entry.Name())); err != nil {
+		if err := runE2ETest(path.Join(dirPath, entry.Name())); err != nil {
 			t.Errorf("e2e test %q failed: %s", entry.Name(), err.Error())
 		}
 	}
 	return nil
 }
 
-func runE2ETest(t *testing.T, inputPath string) error {
+func runE2ETest(inputPath string) error {
 	input, err := os.Open(inputPath)
 	if err != nil {
 		return fmt.Errorf("failed to open test file: %w", err)
@@ -74,7 +74,7 @@ func assertExpectedOutput(expectedOutput io.Reader, output io.Reader) error {
 		return fmt.Errorf("failed to real all of actual output: %w", err)
 	}
 	if !bytes.Equal(bufferedExpectedOutput, bufferedOutput) {
-		return fmt.Errorf("actual output:\n%q\ndoesn't match output:\n%q", bufferedOutput, bufferedExpectedOutput)
+		return fmt.Errorf("actual output:\n%q\ndoesn't match expected output:\n%q", bufferedOutput, bufferedExpectedOutput)
 	}
 	return nil
 }

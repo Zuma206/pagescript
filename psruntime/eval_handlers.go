@@ -2,6 +2,7 @@ package psruntime
 
 import (
 	"fmt"
+	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -11,6 +12,7 @@ var evalNodeHandlers = NewNodeHandlers(
 		html.DocumentNode: evalChildren,
 		html.DoctypeNode:  evalDoctype,
 		html.ElementNode:  evalElement,
+		html.TextNode:     evalText,
 	},
 	ElementHandlerMap{},
 )
@@ -55,4 +57,9 @@ func evalAttrs(psc *PSContext, node *html.Node) error {
 		}
 	}
 	return nil
+}
+
+func evalText(psc *PSContext, node *html.Node) error {
+	_, err := fmt.Fprint(psc.Output(), strings.TrimSpace(node.Data))
+	return err
 }

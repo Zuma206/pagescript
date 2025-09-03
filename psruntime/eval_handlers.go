@@ -38,14 +38,20 @@ func evalElement(psc *PSContext, node *html.Node) error {
 	if err := evalAttrs(psc, node); err != nil {
 		return err
 	}
-	if _, err := fmt.Fprint(psc.Output(), ">"); err != nil {
-		return err
-	}
-	if err := evalChildren(psc, node); err != nil {
-		return err
-	}
-	if _, err := fmt.Fprintf(psc.Output(), "</%s>", node.Data); err != nil {
-		return err
+	if voidElements.Has(node.Data) {
+		if _, err := fmt.Fprint(psc.Output(), "/>"); err != nil {
+			return err
+		}
+	} else {
+		if _, err := fmt.Fprint(psc.Output(), ">"); err != nil {
+			return err
+		}
+		if err := evalChildren(psc, node); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(psc.Output(), "</%s>", node.Data); err != nil {
+			return err
+		}
 	}
 	return nil
 }

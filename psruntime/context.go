@@ -13,19 +13,19 @@ type NodeHandlers interface {
 }
 
 type PSContext struct {
-	handlers  NodeHandlers
-	psRuntime *PSRuntime
-	output    io.Writer
+	handlers NodeHandlers
+	runtime  *PSRuntime
+	output   io.Writer
 }
 
-func (psc *PSContext) Output() io.Writer {
-	return psc.output
+func (ctx *PSContext) Output() io.Writer {
+	return ctx.output
 }
 
-func (psc *PSContext) RunNode(node *html.Node) error {
-	handler, ok := psc.handlers.Get(node.Type)
+func (ctx *PSContext) RunNode(node *html.Node) error {
+	handler, ok := ctx.handlers.Get(node.Type)
 	if !ok {
 		return fmt.Errorf("can't handle node of type %d", node.Type)
 	}
-	return handler(psc, node)
+	return handler(ctx, node)
 }

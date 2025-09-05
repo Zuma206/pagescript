@@ -51,8 +51,8 @@ func runE2ETest(inputPath string) error {
 		return fmt.Errorf("failed to open output file: %w", err)
 	}
 	output := new(bytes.Buffer)
-	psr := psruntime.NewPSRuntime()
-	if err := psr.Run(input, output); err != nil {
+	runtime := psruntime.NewPSRuntime()
+	if err := runtime.Run(input, output); err != nil {
 		return fmt.Errorf("failed to run input: %w", err)
 	}
 	if err := assertExpectedOutput(expectedOutput, output); err != nil {

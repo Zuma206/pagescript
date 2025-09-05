@@ -17,14 +17,14 @@ var passes = []NodeHandlers{
 	evalNodeHandlers,
 }
 
-func (psr *PSRuntime) Run(input io.Reader, output io.Writer) error {
+func (runtime *PSRuntime) Run(input io.Reader, output io.Writer) error {
 	document, err := html.Parse(input)
 	if err != nil {
 		return fmt.Errorf("failed to parse html: %w", err)
 	}
 	psc := &PSContext{
-		output:    output,
-		psRuntime: psr,
+		output:  output,
+		runtime: runtime,
 	}
 	for _, passHandlers := range passes {
 		psc.handlers = passHandlers

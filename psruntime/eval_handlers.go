@@ -17,55 +17,55 @@ var evalNodeHandlers = NewNodeHandlers(
 	ElementHandlerMap{},
 )
 
-func evalChildren(psc *PSContext, node *html.Node) error {
+func evalChildren(ctx *PSContext, node *html.Node) error {
 	for child := range node.ChildNodes() {
-		if err := psc.RunNode(child); err != nil {
+		if err := ctx.RunNode(child); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func evalDoctype(psc *PSContext, node *html.Node) error {
-	_, err := fmt.Fprintf(psc.Output(), "<!DOCTYPE %s>", node.Data)
+func evalDoctype(ctx *PSContext, node *html.Node) error {
+	_, err := fmt.Fprintf(ctx.Output(), "<!DOCTYPE %s>", node.Data)
 	return err
 }
 
-func evalElement(psc *PSContext, node *html.Node) error {
-	if _, err := fmt.Fprintf(psc.Output(), "<%s", node.Data); err != nil {
+func evalElement(ctx *PSContext, node *html.Node) error {
+	if _, err := fmt.Fprintf(ctx.Output(), "<%s", node.Data); err != nil {
 		return err
 	}
-	if err := evalAttrs(psc, node); err != nil {
+	if err := evalAttrs(ctx, node); err != nil {
 		return err
 	}
 	if voidElements.Has(node.Data) {
-		if _, err := fmt.Fprint(psc.Output(), "/>"); err != nil {
+		if _, err := fmt.Fprint(ctx.Output(), "/>"); err != nil {
 			return err
 		}
 	} else {
-		if _, err := fmt.Fprint(psc.Output(), ">"); err != nil {
+		if _, err := fmt.Fprint(ctx.Output(), ">"); err != nil {
 			return err
 		}
-		if err := evalChildren(psc, node); err != nil {
+		if err := evalChildren(ctx, node); err != nil {
 			return err
 		}
-		if _, err := fmt.Fprintf(psc.Output(), "</%s>", node.Data); err != nil {
+		if _, err := fmt.Fprintf(ctx.Output(), "</%s>", node.Data); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func evalAttrs(psc *PSContext, node *html.Node) error {
+func evalAttrs(ctx *PSContext, node *html.Node) error {
 	for _, attr := range node.Attr {
-		if _, err := fmt.Fprintf(psc.Output(), " %s=\"%s\"", attr.Key, attr.Val); err != nil {
+		if _, err := fmt.Fprintf(ctx.Output(), " %s=\"%s\"", attr.Key, attr.Val); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func evalText(psc *PSContext, node *html.Node) error {
-	_, err := fmt.Fprint(psc.Output(), strings.TrimSpace(node.Data))
+func evalText(ctx *PSContext, node *html.Node) error {
+	_, err := fmt.Fprint(ctx.Output(), strings.TrimSpace(node.Data))
 	return err
 }

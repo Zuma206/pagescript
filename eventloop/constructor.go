@@ -21,8 +21,8 @@ func newEventloopOptions(options []EventloopOption) *EventloopOptions {
 func NewEventloop(options ...EventloopOption) *Eventloop {
 	opts := newEventloopOptions(options)
 	return &Eventloop{
-		continuationQueue: make(chan *Continuation, opts.continuationQueueSize),
-		taskQueue:         make(chan *Task, opts.continuationQueueSize),
+		continuations: make(chan *Continuation, opts.continuationQueueSize),
+		tasks:         make(chan *Task, opts.continuationQueueSize),
 	}
 }
 

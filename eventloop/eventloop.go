@@ -14,3 +14,17 @@ func (eventloop *Eventloop) Continue(function ContinuationFunction) *Continuatio
 	eventloop.continuations <- continuation
 	return continuation
 }
+
+func (eventloop *Eventloop) Start() error {
+	for continuation := range eventloop.continuations {
+		if err := continuation.Run(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (eventloop *Eventloop) Stop() {
+	close(eventloop.tasks)
+	close(eventloop.continuations)
+}

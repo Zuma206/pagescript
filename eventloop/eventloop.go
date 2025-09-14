@@ -28,3 +28,17 @@ func (eventloop *Eventloop) Stop() {
 	close(eventloop.tasks)
 	close(eventloop.continuations)
 }
+
+func (eventloop *Eventloop) Worker() {
+	for task := range eventloop.tasks {
+		if continuation := task.function(); continuation != nil {
+			eventloop.Continue(continuation)
+		}
+	}
+}
+
+func (eventloop *Eventloop) Workers(n uint) {
+	for range n {
+		go eventloop.Worker()
+	}
+}

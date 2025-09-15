@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/Zuma206/pagescript/psruntime"
+	"github.com/Zuma206/pagescript/stdlib"
 )
 
 const (
@@ -52,6 +53,7 @@ func runE2ETest(inputPath string) error {
 	}
 	output := new(bytes.Buffer)
 	runtime := psruntime.NewPSRuntime()
+	stdlib.Open(runtime)
 	go runtime.Eventloop().Start()
 	if err := runtime.Run(input, output); err != nil {
 		return fmt.Errorf("failed to run input: %w", err)

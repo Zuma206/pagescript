@@ -14,7 +14,9 @@ var evalNodeHandlers = NewNodeHandlers(
 		html.ElementNode:  evalElement,
 		html.TextNode:     evalText,
 	},
-	ElementHandlerMap{},
+	ElementHandlerMap{
+		"script": evalScript,
+	},
 )
 
 func evalChildren(ctx *PSContext, node *html.Node) error {
@@ -68,4 +70,11 @@ func evalAttrs(ctx *PSContext, node *html.Node) error {
 func evalText(ctx *PSContext, node *html.Node) error {
 	_, err := fmt.Fprint(ctx.Output(), strings.TrimSpace(node.Data))
 	return err
+}
+
+func evalScript(ctx *PSContext, node *html.Node) error {
+	return ctx.Runtime().Eventloop().Block(func() error {
+		_, err := ctx.Runtime().Engine().RunString(node.FirstChild.Data)
+		return err
+	})
 }

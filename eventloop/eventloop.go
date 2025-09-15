@@ -3,6 +3,7 @@ package eventloop
 type Eventloop struct {
 	continuations chan Continuation
 	tasks         chan *Task
+	err           chan error
 }
 
 func (eventloop *Eventloop) Go(function TaskFunction) {
@@ -26,15 +27,22 @@ func (eventloop *Eventloop) Block(function ContinuationFunction) error {
 func (eventloop *Eventloop) Start() error {
 	for continuation := range eventloop.continuations {
 		if err := continuation.Run(); err != nil {
+			eventloop.err <- err
 			return err
 		}
 	}
 	return nil
 }
 
-func (eventloop *Eventloop) Stop() {
+func (eventloop *Eventloop) Stop() error {
 	close(eventloop.tasks)
 	close(eventloop.continuations)
+	select {
+	case err := <-eventloop.err:
+		return err
+	default:
+		return nil
+	}
 }
 
 func (eventloop *Eventloop) Worker() {

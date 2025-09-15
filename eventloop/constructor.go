@@ -25,6 +25,7 @@ func NewEventloop(options ...EventloopOption) *Eventloop {
 	eventloop := &Eventloop{
 		continuations: make(chan Continuation, opts.continuationQueueSize),
 		tasks:         make(chan *Task, opts.continuationQueueSize),
+		err:           make(chan error, 1),
 	}
 	eventloop.Workers(opts.initialWorkers)
 	return eventloop

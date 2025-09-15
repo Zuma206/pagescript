@@ -52,8 +52,12 @@ func runE2ETest(inputPath string) error {
 	}
 	output := new(bytes.Buffer)
 	runtime := psruntime.NewPSRuntime()
+	go runtime.Eventloop().Start()
 	if err := runtime.Run(input, output); err != nil {
 		return fmt.Errorf("failed to run input: %w", err)
+	}
+	if err := runtime.Eventloop().Stop(); err != nil {
+		return fmt.Errorf("eventloop error: %w", err)
 	}
 	if err := assertExpectedOutput(expectedOutput, output); err != nil {
 		return err

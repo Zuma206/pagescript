@@ -1,50 +1,35 @@
 package eventloop
 
-type EventloopOptions struct {
-	continuationQueueSize uint
-	taskQueueSize         uint
-	initialWorkers        uint
-}
+import "github.com/Zuma206/pagescript/options"
 
-type EventloopOption func(options *EventloopOptions)
+const (
+	defaultContinuationQueueSize = 32
+	defaultTaskQueueSize         = 32
+)
 
-func newEventloopOptions(options []EventloopOption) *EventloopOptions {
-	optionsStruct := &EventloopOptions{
-		continuationQueueSize: 32,
-		taskQueueSize:         32,
-		initialWorkers:        0,
-	}
-	for _, option := range options {
-		option(optionsStruct)
-	}
-	return optionsStruct
-}
-
-func NewEventloop(options ...EventloopOption) *Eventloop {
-	opts := newEventloopOptions(options)
+func NewEventloop(opts ...options.Option[*Eventloop]) *Eventloop {
 	eventloop := &Eventloop{
-		continuations: make(chan Continuation, opts.continuationQueueSize),
-		tasks:         make(chan *Task, opts.continuationQueueSize),
+		continuations: make(chan Continuation, defaultContinuationQueueSize),
+		tasks:         make(chan *Task, defaultTaskQueueSize),
 		err:           make(chan error, 1),
 	}
-	eventloop.Workers(opts.initialWorkers)
+	if err := options.Apply(eventloop, opts); err != nil {
+		return nil
+	}
 	return eventloop
 }
 
-func WithContinuationQueueSize(continuationQueueSize uint) EventloopOption {
-	return func(options *EventloopOptions) {
-		options.continuationQueueSize = continuationQueueSize
-	}
-}
+var WithContinuationQueueSize = options.New(func(eventloop *Eventloop, size uint) error {
+	eventloop.continuations = make(chan Continuation, size)
+	return nil
+})
 
-func WithTaskQueueSize(taskQueueSize uint) EventloopOption {
-	return func(options *EventloopOptions) {
-		options.taskQueueSize = taskQueueSize
-	}
-}
+var WithTaskQueueSize = options.New(func(eventloop *Eventloop, size uint) error {
+	eventloop.tasks = make(chan *Task, size)
+	return nil
+})
 
-func WithInitialWorkers(initialWorkers uint) EventloopOption {
-	return func(options *EventloopOptions) {
-		options.initialWorkers = initialWorkers
-	}
-}
+var WithInitialWorkers = options.New(func(eventloop *Eventloop, n uint) error {
+	eventloop.Workers(n)
+	return nil
+})

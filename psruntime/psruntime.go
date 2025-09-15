@@ -4,13 +4,29 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/Zuma206/pagescript/eventloop"
+	"github.com/dop251/goja"
 	"golang.org/x/net/html"
 )
 
-type PSRuntime struct{}
+type PSRuntime struct {
+	eventloop *eventloop.Eventloop
+	engine    *goja.Runtime
+}
 
 func NewPSRuntime() *PSRuntime {
-	return &PSRuntime{}
+	return &PSRuntime{
+		eventloop: eventloop.NewEventloop(),
+		engine:    goja.New(),
+	}
+}
+
+func (runtime *PSRuntime) Eventloop() *eventloop.Eventloop {
+	return runtime.eventloop
+}
+
+func (runtime *PSRuntime) Engine() *goja.Runtime {
+	return runtime.engine
 }
 
 var passes = []NodeHandlers{

@@ -22,6 +22,10 @@ func (ctx *PSContext) Output() io.Writer {
 	return ctx.output
 }
 
+func (ctx *PSContext) Runtime() *PSRuntime {
+	return ctx.runtime
+}
+
 func (ctx *PSContext) RunNode(node *html.Node) error {
 	handler, ok := ctx.handlers.Get(node.Type)
 	if !ok {

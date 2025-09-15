@@ -1,24 +1,25 @@
 package eventloop
 
 type ContinuationFunction func() error
-type Continuation struct {
+type Continuation interface {
+	Run() error
+}
+
+type Callback struct {
 	function ContinuationFunction
-	channel  chan error
 }
 
-func NewContinuation(function ContinuationFunction) *Continuation {
-	return &Continuation{
-		channel:  make(chan error, 1),
-		function: function,
-	}
+func (callback *Callback) Run() error {
+	return callback.function()
 }
 
-func (continuation *Continuation) Await() error {
-	return <-continuation.channel
+type Block struct {
+	function ContinuationFunction
+	err      chan error
 }
 
-func (continuation *Continuation) Run() error {
-	err := continuation.function()
-	continuation.channel <- err
-	return err
+func (block *Block) Run() error {
+	err := block.function()
+	block.err <- err
+	return nil
 }

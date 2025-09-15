@@ -1,7 +1,7 @@
 package eventloop
 
 type Eventloop struct {
-	continuations chan *Continuation
+	continuations chan Continuation
 	tasks         chan *Task
 }
 
@@ -9,10 +9,18 @@ func (eventloop *Eventloop) Go(function TaskFunction) {
 	eventloop.tasks <- &Task{function}
 }
 
-func (eventloop *Eventloop) Continue(function ContinuationFunction) *Continuation {
-	continuation := NewContinuation(function)
-	eventloop.continuations <- continuation
-	return continuation
+func (eventloop *Eventloop) Callback(function ContinuationFunction) {
+	callback := &Callback{function}
+	eventloop.continuations <- callback
+}
+
+func (eventloop *Eventloop) Block(function ContinuationFunction) error {
+	block := &Block{
+		err:      make(chan error),
+		function: function,
+	}
+	eventloop.continuations <- block
+	return <-block.err
 }
 
 func (eventloop *Eventloop) Start() error {
@@ -32,7 +40,7 @@ func (eventloop *Eventloop) Stop() {
 func (eventloop *Eventloop) Worker() {
 	for task := range eventloop.tasks {
 		if continuation := task.function(); continuation != nil {
-			eventloop.Continue(continuation)
+			eventloop.Callback(continuation)
 		}
 	}
 }

@@ -23,7 +23,7 @@ func newEventloopOptions(options []EventloopOption) *EventloopOptions {
 func NewEventloop(options ...EventloopOption) *Eventloop {
 	opts := newEventloopOptions(options)
 	eventloop := &Eventloop{
-		continuations: make(chan *Continuation, opts.continuationQueueSize),
+		continuations: make(chan Continuation, opts.continuationQueueSize),
 		tasks:         make(chan *Task, opts.continuationQueueSize),
 	}
 	eventloop.Workers(opts.initialWorkers)

@@ -18,7 +18,7 @@ func TestContinuationsRunInSerial(t *testing.T) {
 
 	for i := range nContinuations {
 		wg.Add(1)
-		loop.Continue(func() error {
+		loop.Callback(func() error {
 			if !mu.TryLock() {
 				t.Errorf("continuation %d ran in parallel", i)
 			} else {

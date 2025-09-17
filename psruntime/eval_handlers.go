@@ -7,17 +7,19 @@ import (
 	"golang.org/x/net/html"
 )
 
-var evalNodeHandlers = NewNodeHandlers(
-	NodeHandlerMap{
-		html.DocumentNode: evalChildren,
-		html.DoctypeNode:  evalDoctype,
-		html.ElementNode:  evalElement,
-		html.TextNode:     evalText,
-	},
-	ElementHandlerMap{
-		"script": evalScript,
-	},
-)
+func newEvalHandlers() *NodeHandlerRegistry {
+	return NewNodeHandlers(
+		NodeHandlerMap{
+			html.DocumentNode: evalChildren,
+			html.DoctypeNode:  evalDoctype,
+			html.ElementNode:  evalElement,
+			html.TextNode:     evalText,
+		},
+		ElementHandlerMap{
+			"script": evalScript,
+		},
+	)
+}
 
 func evalChildren(ctx *PSContext, node *html.Node) error {
 	for child := range node.ChildNodes() {

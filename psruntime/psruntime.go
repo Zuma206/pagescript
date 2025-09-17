@@ -10,9 +10,11 @@ import (
 )
 
 type PSRuntime struct {
-	eventloop *eventloop.Eventloop
-	engine    *goja.Runtime
-	log       io.Writer
+	evalHandlers *NodeHandlerRegistry
+	eventloop    *eventloop.Eventloop
+	passes       []NodeHandlers
+	engine       *goja.Runtime
+	log          io.Writer
 }
 
 func (runtime *PSRuntime) Eventloop() *eventloop.Eventloop {
@@ -27,10 +29,6 @@ func (runtime *PSRuntime) Log() io.Writer {
 	return runtime.log
 }
 
-var passes = []NodeHandlers{
-	evalNodeHandlers,
-}
-
 func (runtime *PSRuntime) Run(input io.Reader, output io.Writer) error {
 	document, err := html.Parse(input)
 	if err != nil {
@@ -40,7 +38,7 @@ func (runtime *PSRuntime) Run(input io.Reader, output io.Writer) error {
 		output:  output,
 		runtime: runtime,
 	}
-	for _, passHandlers := range passes {
+	for _, passHandlers := range runtime.passes {
 		psc.handlers = passHandlers
 		if err := psc.RunNode(document); err != nil {
 			return err

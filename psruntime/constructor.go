@@ -10,10 +10,13 @@ import (
 )
 
 func NewPSRuntime(opts ...options.Option[*PSRuntime]) *PSRuntime {
+	evalHandlers := newEvalHandlers()
 	runtime := &PSRuntime{
-		eventloop: eventloop.NewEventloop(),
-		engine:    goja.New(),
-		log:       os.Stdout,
+		passes:       []NodeHandlers{evalHandlers},
+		evalHandlers: evalHandlers,
+		eventloop:    eventloop.NewEventloop(),
+		engine:       goja.New(),
+		log:          os.Stdout,
 	}
 	if err := options.Apply(runtime, opts); err != nil {
 		return nil

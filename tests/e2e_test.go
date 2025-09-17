@@ -18,6 +18,7 @@ const (
 	dirPath      = "testdata"
 	testSuffix   = ".html"
 	outputSuffix = ".output"
+	logSuffix    = ".log"
 )
 
 func TestE2E(t *testing.T) {
@@ -47,7 +48,7 @@ func runE2ETest(inputPath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to open test file: %w", err)
 	}
-	output, err := runTestInput(input)
+	output, log, err := runTestInput(input)
 	if err != nil {
 		return fmt.Errorf("error running test: %w", err)
 	}
@@ -57,31 +58,33 @@ func runE2ETest(inputPath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to open expected output: %w", err)
 	}
+	defer expectedOutput.Close()
+	expectedLog, err := os.Open(testName + logSuffix)
+	if err != nil {
+		return err
+	}
+	defer expectedLog.Close()
 
 	return errors.Join(
 		assertExpectedOutput("output", expectedOutput, output),
+		assertExpectedOutput("log", expectedLog, log),
 	)
 }
 
-func runTestInput(input io.Reader) (io.Reader, error) {
-	var output bytes.Buffer
+func runTestInput(input io.Reader) (io.Reader, io.Reader, error) {
+	var output, log bytes.Buffer
 
-	runtime := psruntime.NewPSRuntime()
+	runtime := psruntime.NewPSRuntime(psruntime.WithLog(&log))
 	stdlib.Open(runtime)
 	go runtime.Eventloop().Start()
 
 	if err := runtime.Run(input, &output); err != nil {
-		return nil, fmt.Errorf("failed to run input: %w", err)
+		return nil, nil, fmt.Errorf("failed to run input: %w", err)
 	}
 	if err := runtime.Eventloop().Stop(); err != nil {
-		return nil, fmt.Errorf("eventloop error: %w", err)
+		return nil, nil, fmt.Errorf("eventloop error: %w", err)
 	}
-	return &output, nil
-}
-
-func getOutputPath(inputPath string) string {
-	inputPathWithoutSuffix, _ := strings.CutSuffix(inputPath, testSuffix)
-	return inputPathWithoutSuffix + outputSuffix
+	return &output, &log, nil
 }
 
 func assertExpectedOutput(name string, expectedOutput io.Reader, output io.Reader) error {

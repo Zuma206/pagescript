@@ -2,6 +2,7 @@ package psruntime
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -46,25 +47,36 @@ func runE2ETest(inputPath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to open test file: %w", err)
 	}
-	outputPath := getOutputPath(inputPath)
-	expectedOutput, err := os.Open(outputPath)
+	output, err := runTestInput(input)
 	if err != nil {
-		return fmt.Errorf("failed to open output file: %w", err)
+		return fmt.Errorf("error running test: %w", err)
 	}
-	output := new(bytes.Buffer)
+
+	testName := strings.TrimSuffix(inputPath, testSuffix)
+	expectedOutput, err := os.Open(testName + outputSuffix)
+	if err != nil {
+		return fmt.Errorf("failed to open expected output: %w", err)
+	}
+
+	return errors.Join(
+		assertExpectedOutput("output", expectedOutput, output),
+	)
+}
+
+func runTestInput(input io.Reader) (io.Reader, error) {
+	var output bytes.Buffer
+
 	runtime := psruntime.NewPSRuntime()
 	stdlib.Open(runtime)
 	go runtime.Eventloop().Start()
-	if err := runtime.Run(input, output); err != nil {
-		return fmt.Errorf("failed to run input: %w", err)
+
+	if err := runtime.Run(input, &output); err != nil {
+		return nil, fmt.Errorf("failed to run input: %w", err)
 	}
 	if err := runtime.Eventloop().Stop(); err != nil {
-		return fmt.Errorf("eventloop error: %w", err)
+		return nil, fmt.Errorf("eventloop error: %w", err)
 	}
-	if err := assertExpectedOutput(expectedOutput, output); err != nil {
-		return err
-	}
-	return nil
+	return &output, nil
 }
 
 func getOutputPath(inputPath string) string {
@@ -72,17 +84,17 @@ func getOutputPath(inputPath string) string {
 	return inputPathWithoutSuffix + outputSuffix
 }
 
-func assertExpectedOutput(expectedOutput io.Reader, output io.Reader) error {
+func assertExpectedOutput(name string, expectedOutput io.Reader, output io.Reader) error {
 	bufferedExpectedOutput, err := io.ReadAll(expectedOutput)
 	if err != nil {
-		return fmt.Errorf("failed to real all of expected output: %w", err)
+		return fmt.Errorf("failed to real all of expected %s: %w", name, err)
 	}
 	bufferedOutput, err := io.ReadAll(output)
 	if err != nil {
-		return fmt.Errorf("failed to real all of actual output: %w", err)
+		return fmt.Errorf("failed to real all of actual %s: %w", name, err)
 	}
 	if !bytes.Equal(bufferedExpectedOutput, bufferedOutput) {
-		return fmt.Errorf("actual output:\n%q\ndoesn't match expected output:\n%q", bufferedOutput, bufferedExpectedOutput)
+		return fmt.Errorf("actual %s:\n%q\ndoesn't match expected %s:\n%q", name, bufferedOutput, name, bufferedExpectedOutput)
 	}
 	return nil
 }

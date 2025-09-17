@@ -1,24 +1,26 @@
 package stdlib
 
 import (
+	"fmt"
+
 	"github.com/Zuma206/pagescript/psruntime"
 	"github.com/dop251/goja"
 )
 
 func OpenConsole(psr *psruntime.PSRuntime) error {
 	console := psr.Engine().NewObject()
-	console.Set("log", ConsoleLog(psr))
+	console.Set("log", consoleLog(psr))
 	return psr.Engine().Set("console", console)
 }
 
-func ConsoleLog(psr *psruntime.PSRuntime) any {
+func consoleLog(psr *psruntime.PSRuntime) any {
 	return func(values ...goja.Value) {
 		for i, value := range values {
 			if i != 0 {
-				print(" ")
+				fmt.Fprint(psr.Log(), " ")
 			}
-			print(value.String())
+			fmt.Fprint(psr.Log(), value.String())
 		}
-		println()
+		fmt.Fprintln(psr.Log())
 	}
 }

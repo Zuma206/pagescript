@@ -12,13 +12,7 @@ import (
 type PSRuntime struct {
 	eventloop *eventloop.Eventloop
 	engine    *goja.Runtime
-}
-
-func NewPSRuntime() *PSRuntime {
-	return &PSRuntime{
-		eventloop: eventloop.NewEventloop(),
-		engine:    goja.New(),
-	}
+	log       io.Writer
 }
 
 func (runtime *PSRuntime) Eventloop() *eventloop.Eventloop {
@@ -27,6 +21,10 @@ func (runtime *PSRuntime) Eventloop() *eventloop.Eventloop {
 
 func (runtime *PSRuntime) Engine() *goja.Runtime {
 	return runtime.engine
+}
+
+func (runtime *PSRuntime) Log() io.Writer {
+	return runtime.log
 }
 
 var passes = []NodeHandlers{

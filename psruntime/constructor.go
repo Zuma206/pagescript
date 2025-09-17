@@ -10,11 +10,13 @@ import (
 )
 
 func NewPSRuntime(opts ...options.Option[*PSRuntime]) *PSRuntime {
+	scanHandlers := newScanHandlers()
 	evalHandlers := newEvalHandlers()
 	runtime := &PSRuntime{
-		passes:       []NodeHandlers{evalHandlers},
-		evalHandlers: evalHandlers,
+		passes:       []NodeHandlers{scanHandlers, evalHandlers},
 		eventloop:    eventloop.NewEventloop(),
+		evalHandlers: evalHandlers,
+		scanHandlers: scanHandlers,
 		engine:       goja.New(),
 		log:          os.Stdout,
 	}

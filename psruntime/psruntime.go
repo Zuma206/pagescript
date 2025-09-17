@@ -11,6 +11,7 @@ import (
 
 type PSRuntime struct {
 	evalHandlers *NodeHandlerRegistry
+	scanHandlers *NodeHandlerRegistry
 	eventloop    *eventloop.Eventloop
 	passes       []NodeHandlers
 	engine       *goja.Runtime

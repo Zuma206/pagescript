@@ -52,10 +52,3 @@ func (l *List[T]) InsertAfter(v T, mark *Element[T]) *Element[T] {
 	}
 	return nil
 }
-
-func (l *List[T]) InsertBefore(v T, mark *Element[T]) *Element[T] {
-	if e := l.base.InsertBefore(v, mark.base); e != nil {
-		return &Element[T]{e}
-	}
-	return nil
-}

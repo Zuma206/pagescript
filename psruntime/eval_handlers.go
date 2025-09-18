@@ -14,6 +14,7 @@ func newEvalHandlers() *NodeHandlerRegistry {
 			html.DoctypeNode:  evalDoctype,
 			html.ElementNode:  evalElement,
 			html.TextNode:     evalText,
+			html.CommentNode:  handleSkip,
 		},
 		ElementHandlerMap{
 			"script": evalScript,

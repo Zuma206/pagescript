@@ -19,3 +19,11 @@ func (e *Element[T]) Prev() *Element[T] {
 	}
 	return nil
 }
+
+type List[T any] struct {
+	base *list.List
+}
+
+func NewList[T any]() *List[T] {
+	return &List[T]{list.New()}
+}

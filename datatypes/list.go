@@ -59,3 +59,43 @@ func (l *List[T]) InsertBefore(v T, mark *Element[T]) *Element[T] {
 	}
 	return nil
 }
+
+func (l *List[T]) Len() int {
+	return l.base.Len()
+}
+
+func (l *List[T]) MoveAfter(e, mark *Element[T]) {
+	l.base.MoveAfter(e.base, mark.base)
+}
+
+func (l *List[T]) MoveBefore(e, mark *Element[T]) {
+	l.base.MoveBefore(e.base, mark.base)
+}
+
+func (l *List[T]) MoveToBack(e *Element[T]) {
+	l.base.MoveToBack(e.base)
+}
+
+func (l *List[T]) MoveToFront(e *Element[T]) {
+	l.base.MoveToFront(e.base)
+}
+
+func (l *List[T]) PushBack(v any) *Element[T] {
+	return &Element[T]{l.base.PushBack(v)}
+}
+
+func (l *List[T]) PushBackList(other *List[T]) {
+	l.base.PushBackList(other.base)
+}
+
+func (l *List[T]) PushFront(v any) *Element[T] {
+	return &Element[T]{l.base.PushFront(v)}
+}
+
+func (l *List[T]) PushFrontList(other *List[T]) {
+	l.base.PushFrontList(other.base)
+}
+
+func (l *List[T]) Remove(e *Element[T]) T {
+	return l.base.Remove(e.base).(T)
+}

@@ -27,3 +27,17 @@ type List[T any] struct {
 func NewList[T any]() *List[T] {
 	return &List[T]{list.New()}
 }
+
+func (l *List[T]) Back() *Element[T] {
+	if e := l.base.Back(); e != nil {
+		return &Element[T]{e}
+	}
+	return nil
+}
+
+func (l *List[T]) Front() *Element[T] {
+	if e := l.base.Front(); e != nil {
+		return &Element[T]{e}
+	}
+	return nil
+}

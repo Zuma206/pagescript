@@ -1,6 +1,9 @@
 package datatypes
 
-import "container/list"
+import (
+	"container/list"
+	"iter"
+)
 
 type Element[T any] struct {
 	base *list.Element
@@ -98,4 +101,14 @@ func (l *List[T]) PushFrontList(other *List[T]) {
 
 func (l *List[T]) Remove(e *Element[T]) T {
 	return l.base.Remove(e.base).(T)
+}
+
+func (l *List[T]) Iter() iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for e := l.base.Front(); e != nil; e = e.Next() {
+			if !yield(e.Value.(T)) {
+				return
+			}
+		}
+	}
 }

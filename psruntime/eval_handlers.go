@@ -10,7 +10,7 @@ import (
 func newEvalHandlers() *NodeHandlerRegistry {
 	return NewNodeHandlers(
 		NodeHandlerMap{
-			html.DocumentNode: evalChildren,
+			html.DocumentNode: handleChildren,
 			html.DoctypeNode:  evalDoctype,
 			html.ElementNode:  evalElement,
 			html.TextNode:     evalText,
@@ -19,15 +19,6 @@ func newEvalHandlers() *NodeHandlerRegistry {
 			"script": evalScript,
 		},
 	)
-}
-
-func evalChildren(ctx *PSContext, node *html.Node) error {
-	for child := range node.ChildNodes() {
-		if err := ctx.RunNode(child); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func evalDoctype(ctx *PSContext, node *html.Node) error {
@@ -50,7 +41,7 @@ func evalElement(ctx *PSContext, node *html.Node) error {
 		if _, err := fmt.Fprint(ctx.Output(), ">"); err != nil {
 			return err
 		}
-		if err := evalChildren(ctx, node); err != nil {
+		if err := handleChildren(ctx, node); err != nil {
 			return err
 		}
 		if _, err := fmt.Fprintf(ctx.Output(), "</%s>", node.Data); err != nil {

@@ -20,6 +20,10 @@ func (e *Element[T]) Prev() *Element[T] {
 	return nil
 }
 
+func (e *Element[T]) Value() T {
+	return e.base.Value.(T)
+}
+
 type List[T any] struct {
 	base *list.List
 }

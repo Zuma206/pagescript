@@ -30,6 +30,14 @@ func (runtime *PSRuntime) Log() io.Writer {
 	return runtime.log
 }
 
+func (runtime *PSRuntime) ScanHandlers() *NodeHandlerRegistry {
+	return runtime.scanHandlers
+}
+
+func (runtime *PSRuntime) EvalHandlers() *NodeHandlerRegistry {
+	return runtime.evalHandlers
+}
+
 func (runtime *PSRuntime) Run(input io.Reader, output io.Writer) error {
 	document, err := html.Parse(input)
 	if err != nil {

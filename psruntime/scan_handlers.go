@@ -9,6 +9,7 @@ func newScanHandlers() *NodeHandlerRegistry {
 			html.ElementNode:  handleChildren,
 			html.DoctypeNode:  handleSkip,
 			html.CommentNode:  handleSkip,
+			html.TextNode:     handleSkip,
 		},
 		ElementHandlerMap{},
 		AttrHandlerMap{},

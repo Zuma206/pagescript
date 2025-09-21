@@ -19,6 +19,7 @@ func newEvalHandlers() *NodeHandlerRegistry {
 		ElementHandlerMap{
 			"script": evalScript,
 		},
+		AttrHandlerMap{},
 	)
 }
 

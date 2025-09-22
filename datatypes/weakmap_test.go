@@ -2,6 +2,7 @@ package datatypes
 
 import (
 	"math/rand"
+	"runtime"
 	"testing"
 )
 
@@ -23,5 +24,20 @@ func TestGettingAndSetting(t *testing.T) {
 		} else if actual != expected {
 			t.Errorf("key %p was set to %q rather when %q was expected", key, actual, expected)
 		}
+	}
+}
+
+func TestGarbageCollection(t *testing.T) {
+	weakMap := NewWeakMap[bool, int]()
+	{
+		key := true
+		weakMap.Set(&key, rand.Int())
+		if length := weakMap.Len(); length != 1 {
+			t.Errorf("weakmap has length %d, when a length of 1 was expected", length)
+		}
+	}
+	runtime.GC()
+	if length := weakMap.Len(); length != 0 {
+		t.Errorf("weakmap has length %d, when a length of 0 was expected", length)
 	}
 }

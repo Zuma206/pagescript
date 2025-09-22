@@ -8,20 +8,20 @@ import (
 const nValues = 500
 
 func TestGettingAndSetting(t *testing.T) {
-	weakMap := NewWeakMap[Unit, int]()
-	values := map[*Unit]int{}
+	weakMap := NewWeakMap[bool, int]()
+	values := map[*bool]int{}
 	for range nValues {
-		key := &Unit{}
+		key := true
 		value := rand.Int()
-		values[key] = value
-		weakMap.Set(key, value)
+		values[&key] = value
+		weakMap.Set(&key, value)
 	}
 	for key, expected := range values {
 		actual, ok := weakMap.Get(key)
 		if !ok {
-			t.Errorf("no value set for %q", key)
+			t.Errorf("no value set for %p", key)
 		} else if actual != expected {
-			t.Errorf("key %q was set to %q rather when %q was expected", key, actual, expected)
+			t.Errorf("key %p was set to %q rather when %q was expected", key, actual, expected)
 		}
 	}
 }

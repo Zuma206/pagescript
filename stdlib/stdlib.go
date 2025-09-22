@@ -7,6 +7,7 @@ import (
 func Open(psr *psruntime.PSRuntime) error {
 	return openAll(psr, []OpenFunction{
 		OpenConsole,
+		OpenElements,
 	})
 }
 
